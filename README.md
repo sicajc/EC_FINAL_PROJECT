@@ -4,6 +4,9 @@
 2. Change the normal distribution into Discrete Binomial distribution and implement it using LUT.
 3. Dividing Evaluate Fitness Module into N-stage Pipelines, propagate out_valid and use it as in_valid for POP_rf write back signal.
 4. In evaluate fitness module, WB to POP_rf in negedge clk.
+5. Can Set different modules to different clk frequency to enable faster calculation, like let generate_ind produces child faster. However, we have to solve the problem of CDC.
+6. Notice that the BottleNeck might appears at the Gen_ind block, calculate it using faster frequency is a good idea.
+7. System block design has been completed.
 
 ```mermaid
     graph TD
