@@ -7,6 +7,7 @@
 5. Can Set different modules to different clk frequency to enable faster calculation, like let generate_ind produces child faster. However, we have to solve the problem of CDC.
 6. Notice that the BottleNeck might appears at the Gen_ind block, calculate it using faster frequency is a good idea.
 7. System block design has been completed.
+8. We would discard self-adaptive parameter of each individual to simplify the algorithm.
 
 ```mermaid
     graph TD
