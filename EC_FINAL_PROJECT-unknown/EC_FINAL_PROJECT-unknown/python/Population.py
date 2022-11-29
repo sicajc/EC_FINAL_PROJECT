@@ -46,8 +46,24 @@ class Population:
             individual.mutate()
 
     def crossover(self):
-        indexList1 = list(range(len(self)))
-        indexList2 = list(range(len(self)))
+        index1 = self.uniprng.randint(0, len(self.population))
+        index2 = self.uniprng.randint(0, len(self.population))
+
+        if index1 == index2:
+            index2 += 1
+
+        for _ in range(len(self.population)):
+            if index1 >= len(self.population):
+                index1 = 0
+            if index2 >= len(self.population):
+                index2 = 0
+            rn = self.uniprng.randint(1, 255)/255
+            if rn < self.crossoverFraction:
+                self[index1].crossover(self[index2])
+            index1 += 1
+            index2 += 1
+
+        '''
         self.uniprng.shuffle(indexList1)
         self.uniprng.shuffle(indexList2)
 
@@ -56,32 +72,26 @@ class Population:
                 self[index1].crossover(self[index2])
         else:
             for index1, index2 in zip(indexList1, indexList2):
-                rn = self.uniprng.random()
+                rn = self.uniprng.randint(1, 255)/255
                 if rn < self.crossoverFraction:
                     self[index1].crossover(self[index2])
+        '''
 
     def conductTournament(self):
         # binary tournament
-        indexList1 = list(range(len(self)))
-        indexList2 = list(range(len(self)))
+        index1 = self.uniprng.randint(0, len(self.population))
+        index2 = self.uniprng.randint(0, len(self.population))
 
-        self.uniprng.shuffle(indexList1)
-        self.uniprng.shuffle(indexList2)
-
-        # do not allow self competition
-        for i in range(len(self)):
-            if indexList1[i] == indexList2[i]:
-                temp = indexList2[i]
-                if i == 0:
-                    indexList2[i] = indexList2[-1]
-                    indexList2[-1] = temp
-                else:
-                    indexList2[i] = indexList2[i-1]
-                    indexList2[i-1] = temp
+        if index1 == index2:
+            index2 += 1
 
         # compete
         newPop = []
-        for index1, index2 in zip(indexList1, indexList2):
+        for _ in range(len(self.population)):
+            if index1 >= len(self.population):
+                index1 = 0
+            if index2 >= len(self.population):
+                index2 = 0
             if self[index1].fit > self[index2].fit:
                 newPop.append(copy.deepcopy(self[index1]))
             elif self[index1].fit < self[index2].fit:
@@ -92,6 +102,8 @@ class Population:
                     newPop.append(copy.deepcopy(self[index1]))
                 else:
                     newPop.append(copy.deepcopy(self[index2]))
+            index1 += 1
+            index2 += 1
 
         # overwrite old pop with newPop
         self.population = newPop
