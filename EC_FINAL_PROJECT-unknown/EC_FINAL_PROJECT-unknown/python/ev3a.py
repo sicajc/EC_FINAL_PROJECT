@@ -148,10 +148,10 @@ def ev3(cfg):
         offspring = population.copy()
 
         # select mating pool
-        offspring.conductTournament()
+        index1, index2 = offspring.conductTournament()
 
         # perform crossover
-        offspring.crossover()
+        offspring.crossover(index1, index2)
 
         # random mutation
         offspring.mutate()

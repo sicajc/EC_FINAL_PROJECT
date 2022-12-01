@@ -21,9 +21,20 @@ class Population:
         """
         Population constructor
         """
+        f = open(
+            'C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT-unknown/EC_FINAL_PROJECT-unknown/verilog/input.txt', 'w')
         self.population = []
         for i in range(populationSize):
             self.population.append(self.__class__.individualType())
+            f.write('// individual mutate\n')
+            f.write(format(self.population[i].mutRate, '08b'))
+            f.write('\n')
+            f.write('// individual state\n')
+            self.population[i].mutRate = self.population[i].mutRate/255
+            for ind_state in self.population[i].state:
+                f.write(format(ind_state, '02b'))
+            f.write('\n')
+        f.close()
 
     def __len__(self):
         return len(self.population)
@@ -45,12 +56,7 @@ class Population:
         for individual in self.population:
             individual.mutate()
 
-    def crossover(self):
-        index1 = self.uniprng.randint(0, len(self.population))
-        index2 = self.uniprng.randint(0, len(self.population))
-
-        if index1 == index2:
-            index2 += 1
+    def crossover(self, index1, index2):
 
         for _ in range(len(self.population)):
             if index1 >= len(self.population):
@@ -82,6 +88,9 @@ class Population:
         index1 = self.uniprng.randint(0, len(self.population))
         index2 = self.uniprng.randint(0, len(self.population))
 
+        index1_temp = index1
+        index2_temp = index2
+
         if index1 == index2:
             index2 += 1
 
@@ -107,6 +116,8 @@ class Population:
 
         # overwrite old pop with newPop
         self.population = newPop
+
+        return index1_temp, index2_temp
 
     def combinePops(self, otherPop):
         self.population.extend(otherPop.population)

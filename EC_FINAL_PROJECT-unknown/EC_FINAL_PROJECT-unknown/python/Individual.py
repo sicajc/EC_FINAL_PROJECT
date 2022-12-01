@@ -24,7 +24,7 @@ class Individual:
         self.fit = self.__class__.fitFunc(self.state)
         # self.mutRate = self.uniprng.uniform(0.9, 0.1)  # use "normalized" sigma
         self.mutRate = self.uniprng.randint(1, 255)  # use INT8
-        self.mutRate = self.mutRate/255
+        self.mutRate = self.mutRate
 
     def mutateMutRate(self):
         self.mutRate = self.mutRate * \
