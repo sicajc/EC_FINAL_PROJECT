@@ -1,0 +1,4 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/HIBIKI/Desktop/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT-unknown/EC_FINAL_PROJECT-unknown/verilog/random_number_generater/LFSR.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module LSFR
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/HIBIKI/Desktop/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT-unknown/EC_FINAL_PROJECT-unknown/verilog/random_number_generater/LSFT_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_LSFR

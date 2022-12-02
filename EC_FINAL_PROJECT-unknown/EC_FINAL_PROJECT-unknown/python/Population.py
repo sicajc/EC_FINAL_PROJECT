@@ -27,12 +27,12 @@ class Population:
         for i in range(populationSize):
             self.population.append(self.__class__.individualType())
             f.write('// individual mutate\n')
-            f.write(format(self.population[i].mutRate, '08b'))
+            f.write(format(self.population[i].mutRate, '08b')) # Extension of bit string to 8 bits
             f.write('\n')
             f.write('// individual state\n')
             self.population[i].mutRate = self.population[i].mutRate/255
             for ind_state in self.population[i].state:
-                f.write(format(ind_state, '02b'))
+                f.write(format(ind_state, '02b')) #Extension bit string to 2 bits
             f.write('\n')
         f.close()
 
