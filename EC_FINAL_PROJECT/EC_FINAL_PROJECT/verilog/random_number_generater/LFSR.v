@@ -1,5 +1,5 @@
 module LSFR#(
-           parameter S_WIDTH   = 8 //INT8 ,
+           parameter S_WIDTH   = 8, //INT8
            parameter INT_WIDTH = 2 //ind_state length
        )
        (
@@ -20,7 +20,7 @@ begin
     if(rst_i)
         random_num_ff_1_o <= 'd0;
     else
-        random_num_ff_wr[INT_WIDTH:0];
+        random_num_ff_1_o <= random_num_ff_wr[INT_WIDTH:0];
 end
 
 always @(posedge clk_i or negedge rst_i)

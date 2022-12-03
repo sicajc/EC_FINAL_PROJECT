@@ -27,7 +27,7 @@ begin: self_energy
     integer i;
     for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
     begin
-        if(rst_n)
+        if(~rst_n)
         begin
             self_energy_vec_rf[i] <= 'd0;
         end
@@ -48,7 +48,7 @@ begin: interact_matrix
     for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
         begin
-            if(rst_n)
+            if(~rst_n)
             begin
                 interact_matrix_rf[i][j] <= 'd0;
             end
@@ -68,7 +68,7 @@ begin: ind_buffer
     integer i;
     for(i=0;i<LATTICE_LENGTH;i=i+1)
     begin
-        if(rst_n)
+        if(~rst_n)
         begin
             individual_buffer[i] <= 'd0;
         end
