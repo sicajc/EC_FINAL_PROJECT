@@ -2,3 +2,6 @@ Running: xsim.dir/tb_LSFR_behav/xsimk.exe -simmode gui -wdb tb_LSFR_behav.wdb -s
 Design successfully loaded
 Design Loading Memory Usage: 6820 KB (Peak: 6820 KB)
 Design Loading CPU Usage: 0 ms
+Simulation completed
+Simulation Memory Usage: 7464 KB (Peak: 7464 KB)
+Simulation CPU Usage: 15 ms
