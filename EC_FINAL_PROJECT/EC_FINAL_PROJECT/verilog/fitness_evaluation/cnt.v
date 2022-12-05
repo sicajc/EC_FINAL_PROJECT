@@ -32,7 +32,7 @@ begin
     end
 end
 
-// assign cnt_wr = clr_i ? 'd0 : (en_i ? cnt_ff + 1 : cnt_ff);
+assign cnt_wr = clr_i ? 'd0 : (en_i ? cnt_ff + 1 : cnt_ff);
 
 // always @(*)
 // begin
