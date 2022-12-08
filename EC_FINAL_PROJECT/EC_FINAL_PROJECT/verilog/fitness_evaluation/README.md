@@ -13,8 +13,8 @@
 
    for(int i = 0 ; i < LatticeLength ; i = i + 1)
    {
-        totalEnergy += selfEnergyVector[i];
-        if(i < 10) totalEnergy += interactionMatrix[i][i+1] * 2;
+        totalEnergy += selfEnergyVector[individual[i]];
+        if(i < 10) totalEnergy += interactionMatrix[individual[i]][individual[i+1]] * 2;
    }
 
    return totalEnergy
