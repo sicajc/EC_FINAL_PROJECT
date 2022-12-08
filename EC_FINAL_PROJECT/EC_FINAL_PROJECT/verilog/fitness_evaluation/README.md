@@ -49,7 +49,7 @@
 
 # Datapath
 ## Main datapath
-
+![](image/eval_fit_dp.png)
 
 
 
