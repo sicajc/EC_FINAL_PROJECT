@@ -31,6 +31,7 @@ wire ind_wb_idx_ff_o;
 //interger
 //integer seed=87;
 integer i,j;
+integer f;
 
 //reg 
 reg [SELF_FIT_LENGTH-1:0] total_energy_check=0;
@@ -47,6 +48,7 @@ end
 
 //main
 initial begin  
+    f=$fopen("C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/fitness_evaluation/test.txt","w");
     rst_n = 0;
     in_valid_i = 0;
     Set_data_i = 0;
@@ -71,6 +73,7 @@ task input_task; begin
     interact_matrix_i = 'bx;
     for(i=0;i<POP_SIZE;i=i+1) begin
         in_valid_i = 1;
+        total_energy_check = 0;
         for(j=0;j<LATTICE_LENGTH;j=j+1) begin
             random_number_delay = random_number;
             random_number = $urandom_range(0,2);
@@ -87,10 +90,20 @@ task input_task; begin
                 $display("something error,out is %3d,exp is %3d",total_energy_ff_o,total_energy_check_d3);
             end
         end
+        write;
         @(negedge clk_i);
     end
+    $fclose(f);
 end 
 endtask:input_task
+
+task write; begin
+    for(j=0;j<LATTICE_LENGTH;j=j+1) begin
+        $fwrite(f,"%d ",individual_vec_i[PARTICLE_LENGTH*j +: PARTICLE_LENGTH]);
+    end
+    $fwrite(f,"\n");
+end
+endtask : write
 
 //total_energy_check_delay
 always @(posedge clk_i) begin
