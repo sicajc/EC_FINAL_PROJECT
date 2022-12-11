@@ -30,7 +30,10 @@ module fitness_eval #(
 //================================================================
 //SelfEnergy = SE
 //IneractEnergy = IE
-localparam LV1_SE_ADDER_NUM = 5;
+localparam SE_DF_ADD1_PIPE_DEPTH = LATTICE_LENGTH;
+localparam IE_DF_ADD1_PIPE_DEPTH = LATTICE_LENGTH - 1;
+
+localparam LV1_SE_ADDER_NUM = 6;
 localparam LV1_IE_ADDER_NUM = 5;
 
 localparam LV2_SE_ADDER_NUM = 3;
@@ -53,7 +56,7 @@ localparam CNT_WIDTH = 4;
 //  INNER COMPONENTS
 //================================================================
 // Buffer stage
-reg[DATA_WIDTH - 1 :0] individual_buffer[0:LATTICE_LENGTH-1];
+reg[PARTICLE_LENGTH - 1 :0] individual_buffer[0:LATTICE_LENGTH-1];
 reg in_valid_buf;
 reg ind_idx_buf;
 
@@ -61,20 +64,19 @@ reg ind_idx_buf;
 reg[DATA_WIDTH - 1 :0] self_energy_vec_rf[0:NUM_PARTICLE_TYPE-1];
 reg[DATA_WIDTH - 1 :0] interact_matrix_rf[0:NUM_PARTICLE_TYPE-1][0:NUM_PARTICLE_TYPE-1];
 
-reg[DF_ADD1_PIPE_WIDTH - 1: 0] self_energy_DF_ADD1_pipe;
-reg[DF_ADD1_PIPE_WIDTH - 1: 0] interact_energy_DF_ADD1_pipe;
+reg[DF_ADD1_PIPE_WIDTH - 1: 0] self_energy_DF_ADD1_pipe[0:SE_DF_ADD1_PIPE_DEPTH-1];
+reg[DF_ADD1_PIPE_WIDTH - 1: 0] interact_energy_DF_ADD1_pipe[0:IE_DF_ADD1_PIPE_DEPTH-1];
 reg in_valid_DF_ADD1_pipe;
 reg ind_idx_DF_ADD1_pipe;
 
 // ADD1 stage
-wire[0:LV1_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv1          [LV1_SE_ADDER_NUM - 1 :0];
-wire[0:LV2_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv2          [LV2_SE_ADDER_NUM - 1 :0];
-wire[0:LV3_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv3          [LV3_ADDER_NUM    - 1 :0];
+wire[LV1_ADD_RESULT_WIDTH-1:0]      self_energy_add_tree_lv1          [0:LV1_SE_ADDER_NUM -1];
+wire[LV2_ADD_RESULT_WIDTH-1:0]      self_energy_add_tree_lv2          [0:LV2_SE_ADDER_NUM -1];
 
-wire[0:LV1_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv1      [LV1_IE_ADDER_NUM - 1 :0];
-wire[0:LV2_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv2      [LV2_IE_ADDER_NUM - 1 :0];
+wire[LV1_ADD_RESULT_WIDTH-1:0]      interact_energy_add_tree_lv1      [0:LV1_IE_ADDER_NUM - 1];
+wire[LV2_ADD_RESULT_WIDTH-1:0]      interact_energy_add_tree_lv2      [0:LV2_IE_ADDER_NUM - 1];
 
-wire[0:LV3_ADD_RESULT_WIDTH-1]      partial_energy_add_tree_lv3       [LV3_ADDER_NUM-1:0];
+wire[LV3_ADD_RESULT_WIDTH-1:0]      partial_energy_add_tree_lv3       [0:LV3_ADDER_NUM-1];
 
 reg[PARTIAL_ENERGY_PIPE_WIDTH-1 : 0]     partial_energy_ADD1_ADD2_pipe[0:LV3_ADDER_NUM-1];
 
@@ -91,6 +93,8 @@ wire done_flag;
 //  GENERATE VARAIBLE
 //================================================================
 genvar adder_idx;
+integer pipe_idx;
+integer i,j;
 
 //================================================================
 //  MAIN DESIGN
@@ -116,7 +120,7 @@ begin: IND_BUF
         end
         else
         begin
-            individual_buffer[i] <= in_valid_i ? individual_vec_i[i*DATA_WIDTH +: DATA_WIDTH] : 'd0;
+            individual_buffer[i] <= in_valid_i ? individual_vec_i[i*PARTICLE_LENGTH +:  PARTICLE_LENGTH] : 'd0;
         end
     end
 end
@@ -126,7 +130,6 @@ end
 //==============================//
 always @(posedge clk_i or negedge rst_n)
 begin: SELF_ENERGY_VEC_RF
-    integer i;
     for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
     begin
         if(~rst_n)
@@ -146,7 +149,6 @@ end
 
 always @(posedge clk_i or negedge rst_n)
 begin: INTERACT_MATRIX_RF
-    integer i,j;
     for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
         begin
@@ -171,7 +173,6 @@ end
 
 always @(posedge clk_i or negedge rst_n)
 begin: SELF_ENERGY_DF_ADD1_PIPE
-    integer i;
     for(i = 0; i < LATTICE_LENGTH ; i = i + 1)
         if(~rst_n)
         begin
@@ -185,7 +186,6 @@ end
 
 always @(posedge clk_i or negedge rst_n)
 begin: INTERACT_ENERGY_DF_ADD1_PIPE
-    integer i;
     for(i=0;i<LATTICE_LENGTH-1;i=i+1)
     begin
         //0~9 total 10 lines are being pulled out.
@@ -211,10 +211,11 @@ end
 //=======================//
 //lv1.
 generate
-    for(adder_idx =0; adder_idx < LV1_SE_ADDER_NUM; adder_idx = adder_idx +1)
+    for(adder_idx =0; adder_idx < LV1_SE_ADDER_NUM-1; adder_idx = adder_idx +1)
     begin: LV1_SE_adder_Tree1
         assign self_energy_add_tree_lv1[adder_idx] = (self_energy_DF_ADD1_pipe[adder_idx*2] + self_energy_DF_ADD1_pipe[adder_idx*2+ 1]);
     end
+        assign self_energy_add_tree_lv1[LV1_SE_ADDER_NUM-1] = {1'b0,self_energy_DF_ADD1_pipe[LATTICE_LENGTH-1]};
 
     for(adder_idx =0; adder_idx < LV1_IE_ADDER_NUM; adder_idx = adder_idx +1)
     begin: LV1_IE_adder_Tree1
@@ -260,8 +261,7 @@ assign partial_energy_add_tree_lv3[2] = interact_energy_add_tree_lv2[1] + intera
 
 always @(posedge clk_i or negedge rst_n)
 begin: ADD1_ADD2_PIPE
-    integer pipe_idx;
-    for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM - 1 ; pipe_idx = pipe_idx + 1)
+    for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM ; pipe_idx = pipe_idx + 1)
         if(~rst_n)
         begin
             partial_energy_ADD1_ADD2_pipe[pipe_idx] <= 'd0;
