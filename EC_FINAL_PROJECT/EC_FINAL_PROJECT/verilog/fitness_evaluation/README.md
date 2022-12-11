@@ -25,5 +25,11 @@
 ![](image/eval_fit_dp.png)
 
 
-
 # Testbench
+1. Note that the data fed in from MSB -> LSB. i.e. 36'b110010101......1' = MSB {self_energy[0] self_energy[1] self_energy[2] ..... self_energy[N]}'
+2. Data is listed in a Big Endian representation
+3. Remember to add a logFile to each design whenever you modify something.
+
+
+# Log
+[Log for each modification to the design](log.md)
