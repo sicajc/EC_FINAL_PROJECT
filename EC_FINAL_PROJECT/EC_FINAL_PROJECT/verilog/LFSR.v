@@ -1,11 +1,11 @@
 module LSFR#(
-           parameter S_WIDTH   = 8 //INT8 ,
+           parameter S_WIDTH   = 8, //INT8 ,
+           parameter RANDOM_SEED = {S_WIDTH{1'b0}}
        )
        (
            input clk,
            input rst_n,
            //1: 0~255 , 2:0 ~ 3, 3: 1~40
-           input [S_WIDTH-1:0] random_seed_i,
            input in_valid,
            output reg [S_WIDTH-1:0]   random_num_ff_o
        );
@@ -44,13 +44,13 @@ always @(*) begin
     for (i = 0; i < S_WIDTH; i=i+1) begin
         if(in_valid) begin
             if(i===3 || i===4 || i===5) begin
-                random_num_ff_temp[i-1] = random_seed_i[i] ^ random_seed_i[0];
+                random_num_ff_temp[i-1] = RANDOM_SEED[i] ^ RANDOM_SEED[0];
             end
             else if(i === 0) begin
-                random_num_ff_temp[S_WIDTH-1] = random_seed_i[0];
+                random_num_ff_temp[S_WIDTH-1] = RANDOM_SEED[0];
             end
             else begin
-                random_num_ff_temp[i-1] = random_seed_i[i];
+                random_num_ff_temp[i-1] = RANDOM_SEED[i];
             end
         end
         else if(current_state) begin

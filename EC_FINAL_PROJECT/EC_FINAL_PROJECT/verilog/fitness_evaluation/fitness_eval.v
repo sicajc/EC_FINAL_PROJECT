@@ -1,11 +1,12 @@
 module fitness_eval #(
            parameter NUM_PARTICLE_TYPE        = 3  ,
            parameter DATA_WIDTH               = 4  ,
+           parameter PARTICLE_LENGTH          = 2  ,
            parameter LATTICE_LENGTH           = 11 ,
            parameter SELF_FIT_LENGTH          = 10 ,
            parameter SELF_ENERGY_VEC_LENGTH   = NUM_PARTICLE_TYPE*DATA_WIDTH,
            parameter INTERATION_MATRIX_LENGTH = (NUM_PARTICLE_TYPE**2)*DATA_WIDTH,
-           parameter INDIVIDUAL_LENGTH        = LATTICE_LENGTH * DATA_WIDTH,
+           parameter INDIVIDUAL_LENGTH        = LATTICE_LENGTH * PARTICLE_LENGTH,
            parameter POP_SIZE                 = 50
        ) (
            //Inputs
@@ -99,8 +100,8 @@ genvar adder_idx;
 //===============================//
 always @(posedge clk_i or negedge rst_n )
 begin : IN_VALID_BUF
-    in_valid_buf <= ~rst_n ? 1'b1 : in_valid_i;
-    ind_idx_buf  <= ~rst_n ? 1'b1 : ind_idx_i;
+    in_valid_buf <= ~rst_n ? 1'b0 : in_valid_i;
+    ind_idx_buf  <= ~rst_n ? 1'b0 : ind_idx_i;
 end
 
 
@@ -115,7 +116,7 @@ begin: IND_BUF
         end
         else
         begin
-            individual_buffer[i] <= individual_vec_i[i*DATA_WIDTH +: DATA_WIDTH];
+            individual_buffer[i] <= in_valid_i ? individual_vec_i[i*DATA_WIDTH +: DATA_WIDTH] : 'd0;
         end
     end
 end
@@ -249,8 +250,8 @@ generate
 endgenerate
 
 //lv3
-assign partial_energy_add_tree_lv3[0] = self_energy_add_tree_lv2[0] + self_energy_add_tree_lv2[1];
-assign partial_energy_add_tree_lv3[1] = self_energy_add_tree_lv2[2] + interact_energy_add_tree_lv2[0];
+assign partial_energy_add_tree_lv3[0] = self_energy_add_tree_lv2[0]     + self_energy_add_tree_lv2[1];
+assign partial_energy_add_tree_lv3[1] = self_energy_add_tree_lv2[2]     + interact_energy_add_tree_lv2[0];
 assign partial_energy_add_tree_lv3[2] = interact_energy_add_tree_lv2[1] + interact_energy_add_tree_lv2[2];
 
 //=====================//
@@ -267,7 +268,7 @@ begin: ADD1_ADD2_PIPE
         end
         else
         begin
-            partial_energy_ADD1_ADD2_pipe[pipe_idx]  <= partial_energy_add_tree_lv3[pipe_idx];
+            partial_energy_ADD1_ADD2_pipe[pipe_idx] <= partial_energy_add_tree_lv3[pipe_idx];
         end
 end
 
