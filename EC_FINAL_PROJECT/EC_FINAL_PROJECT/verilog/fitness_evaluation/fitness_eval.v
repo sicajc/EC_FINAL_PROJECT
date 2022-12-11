@@ -44,7 +44,7 @@ localparam LV4_ADD_RESULT_WIDTH  = DATA_WIDTH + 5;
 localparam LV5_ADD_RESULT_WIDTH  = SELF_FIT_LENGTH;
 
 localparam DF_ADD1_PIPE_WIDTH    = DATA_WIDTH + 1;
-localparam PARTIAL_ENERGY_PIPE   = LV3_ADD_RESULT_WIDTH;
+localparam PARTIAL_ENERGY_PIPE_WIDTH   = LV3_ADD_RESULT_WIDTH;
 
 localparam CNT_WIDTH = 4;
 
@@ -66,16 +66,16 @@ reg in_valid_DF_ADD1_pipe;
 reg ind_idx_DF_ADD1_pipe;
 
 // ADD1 stage
-wire[0:LV1_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv1     [LV1_SE_ADDER_NUM - 1 :0];
-wire[0:LV2_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv2     [LV2_SE_ADDER_NUM - 1 :0];
-wire[0:LV3_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv3     [LV3_ADDER_NUM    - 1 :0];
+wire[0:LV1_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv1          [LV1_SE_ADDER_NUM - 1 :0];
+wire[0:LV2_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv2          [LV2_SE_ADDER_NUM - 1 :0];
+wire[0:LV3_ADD_RESULT_WIDTH-1]      self_energy_add_tree_lv3          [LV3_ADDER_NUM    - 1 :0];
 
-wire[0:LV1_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv1 [LV1_IE_ADDER_NUM - 1 :0];
-wire[0:LV2_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv2 [LV2_IE_ADDER_NUM - 1 :0];
+wire[0:LV1_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv1      [LV1_IE_ADDER_NUM - 1 :0];
+wire[0:LV2_ADD_RESULT_WIDTH-1]      interact_energy_add_tree_lv2      [LV2_IE_ADDER_NUM - 1 :0];
 
-wire[0:LV3_ADD_RESULT_WIDTH-1]      partial_energy_add_tree_lv3  [LV3_ADDER_NUM-1:0];
+wire[0:LV3_ADD_RESULT_WIDTH-1]      partial_energy_add_tree_lv3       [LV3_ADDER_NUM-1:0];
 
-reg[LV3_ADD_RESULT_WIDTH-1 : 0]     partial_energy_ADD1_ADD2_pipe[0:LV3_ADDER_NUM-1];
+reg[PARTIAL_ENERGY_PIPE_WIDTH-1 : 0]     partial_energy_ADD1_ADD2_pipe[0:LV3_ADDER_NUM-1];
 
 //ADD2 and output stage
 reg in_valid_ADD1_ADD2_pipe;
