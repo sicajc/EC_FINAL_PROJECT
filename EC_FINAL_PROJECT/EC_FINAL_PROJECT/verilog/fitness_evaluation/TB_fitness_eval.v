@@ -64,7 +64,6 @@ initial begin
 end
 
 task input_task; begin
-    @(negedge clk_i);
     Set_data_i = 0;
     self_energy_vec_i = 12'b000100100011;
     interact_matrix_i = 36'b101001000001010010100101000101011010;
