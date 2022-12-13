@@ -19,19 +19,19 @@ reg [S_WIDTH-1:0] random_num_ff_reg;
 //-------FSM--------
 reg current_state,next_state;
 //next_state
-always @(*) begin 
+always @(*) begin
     case (current_state)
         0 : next_state = in_valid ? 1 : 0;
-        1 : next_state = current_state; 
+        1 : next_state = current_state;
         default : next_state = 0;
     endcase
 end
 
 //current_state
-always @(posedge clk or negedge rst_n) begin 
+always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
         current_state <= 0;
-    end 
+    end
     else begin
         current_state <= next_state;
     end
@@ -71,7 +71,7 @@ always @(*) begin
 end
 
 //reg
-always @(posedge clk or negedge rst_n) begin 
+always @(posedge clk or negedge rst_n) begin
     if(~rst_n) begin
         random_num_ff_reg <= 0;
     end else begin
@@ -80,7 +80,7 @@ always @(posedge clk or negedge rst_n) begin
 end
 
 //Outputs
-always @(*) begin 
+always @(*) begin
     random_num_ff_o = random_num_ff_reg[S_WIDTH-1:0];
 end
 
