@@ -222,6 +222,7 @@ end
 always @(posedge clk_i or negedge rst_n)
 begin: INDIVIDUAL_VEC_DF_ADD1_PIPE
     for(i=0;i<LATTICE_LENGTH;i=i+1)
+    begin
         if(~rst_n)
         begin
             individual_vec_DF_ADD1_pipe <= 'd0;
@@ -230,6 +231,7 @@ begin: INDIVIDUAL_VEC_DF_ADD1_PIPE
         begin
             individual_vec_DF_ADD1_pipe[INDIVIDUAL_LENGTH-1 - PARTICLE_LENGTH*i -: PARTICLE_LENGTH] <= individual_buffer[i];
         end
+    end
 end
 
 
@@ -345,7 +347,7 @@ begin: INDIVIDUAL_CNT
         begin
             individual_cnt <= 'd0;
         end
-        else if(wrInteractRow_bound_reach_flag)
+        else if(wrInteractRight_bound_reach_flag)
         begin
             individual_cnt[3:2] <= individual_cnt[3:2] + 'd1;
             individual_cnt[1:0] <= 'd0;
@@ -373,10 +375,9 @@ assign interactMatrix_RowPtr = individual_cnt[3:2];
 assign interactMatrix_ColPtr = individual_cnt[1:0];
 assign selfEnergyPtr         = individual_cnt[1:0];
 
-
-assign wrInteractMatrix_done_flag = (wrInteractRow_bound_reach_flag && wrInteractCol_bound_reach_flag);
-assign wrSelfEnergy_done_flag     = (individual_cnt == SELF_ENERGY_VEC_LENGTH-1);
-assign done_flag                  = (individual_cnt == POP_SIZE-1);
+assign wrInteractMatrix_done_flag       = (wrInteractRight_bound_reach_flag && wrInteractLower_bound_reach_flag);
+assign wrSelfEnergy_done_flag           = (individual_cnt == SELF_ENERGY_VEC_LENGTH-1);
+assign done_flag                        = (individual_cnt == POP_SIZE-1);
 
 //====================//
 //  OUTPUT stage      //
