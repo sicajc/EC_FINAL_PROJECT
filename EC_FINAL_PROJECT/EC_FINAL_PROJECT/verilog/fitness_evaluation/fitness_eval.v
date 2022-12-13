@@ -331,6 +331,7 @@ end
 //2 lv Adder tree
 assign total_energy_wr = (partial_energy_ADD1_ADD2_pipe[0] + partial_energy_ADD1_ADD2_pipe[1]) + {1'b0,partial_energy_ADD1_ADD2_pipe[2]};
 
+
 always @(posedge clk_i or negedge rst_n)
 begin: INDIVIDUAL_CNT
     if(~rst_n)
@@ -342,6 +343,10 @@ begin: INDIVIDUAL_CNT
         if(wrInteractMatrix_done_flag || wrSelfEnergy_done_flag)
         begin
             individual_cnt <= 'd0;
+        end
+        else if(wrInteractRow_bound_reach_flag)
+        begin
+            individual_cnt <= 'b100;
         end
         else
         begin
@@ -362,7 +367,14 @@ begin: INDIVIDUAL_CNT
     end
 end
 
-assign wrInteractMatrix_done_flag = (individual_cnt == INTERACTION_MATRIX_LENGTH-1);
+assign interactMatrix_RowPtr = individual_cnt[3:2];
+assign interactMatrix_ColPtr = individual_cnt[1:0];
+assign selfEnergyPtr         = individual_cnt[1:0];
+
+assign wrInteractRow_bound_reach_flag = interactMatrix_ColPtr == NUM_PARTICLE_TYPE-1;
+assign wrInteractCol_bound_reach_flag = interactMatrix_RowPtr == NUM_PARTICLE_TYPE-1;
+
+assign wrInteractMatrix_done_flag = (wrInteractRow_bound_reach_flag && wrInteractCol_bound_reach_flag);
 assign wrSelfEnergy_done_flag     = (individual_cnt == SELF_ENERGY_VEC_LENGTH-1);
 assign done_flag                  = (individual_cnt == POP_SIZE-1);
 
