@@ -104,8 +104,8 @@ wire wrSelfEnergy_done_flag;
 
 wire[LV5_ADD_RESULT_WIDTH-1: 0] total_energy_wr;
 wire done_flag;
-wire wrInteractRow_bound_reach_flag = interactMatrix_ColPtr == NUM_PARTICLE_TYPE-1;
-wire wrInteractCol_bound_reach_flag = interactMatrix_RowPtr == NUM_PARTICLE_TYPE-1;
+wire wrInteractRight_bound_reach_flag = interactMatrix_ColPtr == NUM_PARTICLE_TYPE-1;
+wire wrInteractLower_bound_reach_flag = interactMatrix_RowPtr == NUM_PARTICLE_TYPE-1;
 
 
 //================================================================

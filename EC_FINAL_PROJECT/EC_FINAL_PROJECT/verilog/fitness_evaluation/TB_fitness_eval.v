@@ -78,12 +78,15 @@ task input_task;
         // set initial energy
         wrSelfEnergyValid_i = 1;
         wrInteractEnergyValid_i = 1;
-        for(i=0;i<NUM_PARTICLE_TYPE**2;i=i+1) begin
+        for(i=0;i<NUM_PARTICLE_TYPE**2;i=i+1)
+        begin
             n=$fscanf(interact_energy_file,"%b",interact_energy_i);
-            if(i < NUM_PARTICLE_TYPE) begin
+            if(i < NUM_PARTICLE_TYPE)
+            begin
                 m=$fscanf(self_energy_file,"%b",self_energy_i);
             end
-            else begin
+            else
+            begin
                 self_energy_i = 'bx;
                 wrSelfEnergyValid_i = 0;
             end
@@ -118,9 +121,38 @@ task input_task;
                     $display("------------ Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha Ha -----------");
                     $display("----------------something error,out is %3d,exp is %3d------------",total_energy_ff_o,total_energy_check_d4);
                     $display("------------------------ Keep Fighting --------------------------\n\n");
+                    $display("============================================================================");
+                    $display("      ▄▄           ▄▄  ");
+                    $display("       ██         ██ ");
+                    $display("        ██       ██ ");
+                    $display("          ██   ██ ");
+                    $display("           ██ ██  ");
+                    $display("        ▄▄██████████▄  		                ERRORS!!!");
+                    $display("      █▀             ▀█ ");
+                    $display("      █   █████████   █ 	MY GRANDMA writes a better program than you.");
+                    $display("      █  ▄█▀    ▀█▄   █");
+                    $display("██    █  █   ▄█▄   █  █     ██");
+                    $display("███   █  █   ███   █  █   ▄███");
+                    $display("█ ██  █  █   ▀█▀   █  █  ▄█ █");
+                    $display("▀█ ██ █  ▀█▄     ▄█▀  █ ▄█ █▀ ");
+                    $display(" ▀█ █▄█     ▀███▀     █▄█ █▀");
+                    $display("   ▀██                █▀");
+                    $display("      █  ▄████████▄   █▌");
+                    $display("      █  █        █   █");
+                    $display("      █  █        █   █");
+                    $display("      █  ▀▀▀▀▀▀▀▀▀▀   █ ");
+                    $display("      ██             ██");
+                    $display("       ██           ██ ");
+                    $display("        █ ▄██████▄ █ ");
+                    $display("        █ █      █ █ ");
+                    $display("        █ █      █ █  ");
+                    $display("        ██▀      ▀██   ");
+                    $display("============================================================================");
+                    $finish;
                     $finish;
                 end
-                else begin
+                else
+                begin
                     $display("----------------out is %3d,exp is %3d------------",total_energy_ff_o,total_energy_check_d4);
                 end
             end
@@ -155,34 +187,34 @@ begin
 end
 
 //module
-    fitness_eval #(
-            .NUM_PARTICLE_TYPE(NUM_PARTICLE_TYPE),
-            .DATA_WIDTH(DATA_WIDTH),
-            .PARTICLE_LENGTH(PARTICLE_LENGTH),
-            .LATTICE_LENGTH(LATTICE_LENGTH),
-            .SELF_FIT_LENGTH(SELF_FIT_LENGTH),
-            .SELF_ENERGY_VEC_LENGTH(SELF_ENERGY_VEC_LENGTH),
-            .INTERACTION_MATRIX_LENGTH(INTERACTION_MATRIX_LENGTH),
-            .INDIVIDUAL_LENGTH(INDIVIDUAL_LENGTH),
-            .POP_SIZE(POP_SIZE),
-            .IDX_WIDTH(IDX_WIDTH),
-            .PTR_LENGTH(PTR_LENGTH)
-        ) inst_fitness_eval (
-            .clk_i                   (clk_i),
-            .rst_n                   (rst_n),
-            .self_energy_i           (self_energy_i),
-            .interact_energy_i       (interact_energy_i),
-            .individual_vec_i        (individual_vec_i),
-            .wrSelfEnergyValid_i     (wrSelfEnergyValid_i),
-            .wrInteractEnergyValid_i (wrInteractEnergyValid_i),
-            .in_valid_i              (in_valid_i),
-            .ind_idx_i               (ind_idx_i),
-            .out_valid_ff_o          (out_valid_ff_o),
-            .done_ff_o               (done_ff_o),
-            .total_energy_ff_o       (total_energy_ff_o),
-            .individual_vec_ff_o     (individual_vec_ff_o),
-            .ind_wb_idx_ff_o         (ind_wb_idx_ff_o)
-        );
+fitness_eval #(
+                 .NUM_PARTICLE_TYPE(NUM_PARTICLE_TYPE),
+                 .DATA_WIDTH(DATA_WIDTH),
+                 .PARTICLE_LENGTH(PARTICLE_LENGTH),
+                 .LATTICE_LENGTH(LATTICE_LENGTH),
+                 .SELF_FIT_LENGTH(SELF_FIT_LENGTH),
+                 .SELF_ENERGY_VEC_LENGTH(SELF_ENERGY_VEC_LENGTH),
+                 .INTERACTION_MATRIX_LENGTH(INTERACTION_MATRIX_LENGTH),
+                 .INDIVIDUAL_LENGTH(INDIVIDUAL_LENGTH),
+                 .POP_SIZE(POP_SIZE),
+                 .IDX_WIDTH(IDX_WIDTH),
+                 .PTR_LENGTH(PTR_LENGTH)
+             ) inst_fitness_eval (
+                 .clk_i                   (clk_i),
+                 .rst_n                   (rst_n),
+                 .self_energy_i           (self_energy_i),
+                 .interact_energy_i       (interact_energy_i),
+                 .individual_vec_i        (individual_vec_i),
+                 .wrSelfEnergyValid_i     (wrSelfEnergyValid_i),
+                 .wrInteractEnergyValid_i (wrInteractEnergyValid_i),
+                 .in_valid_i              (in_valid_i),
+                 .ind_idx_i               (ind_idx_i),
+                 .out_valid_ff_o          (out_valid_ff_o),
+                 .done_ff_o               (done_ff_o),
+                 .total_energy_ff_o       (total_energy_ff_o),
+                 .individual_vec_ff_o     (individual_vec_ff_o),
+                 .ind_wb_idx_ff_o         (ind_wb_idx_ff_o)
+             );
 
 
 
