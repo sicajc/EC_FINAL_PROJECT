@@ -65,7 +65,7 @@ begin
     Set_data_i = 1;
     input_task;
 end
-        
+
 task input_task;
     begin
         @(negedge clk_i);
