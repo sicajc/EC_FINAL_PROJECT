@@ -42,7 +42,7 @@ end
 //random_num_ff_temp
 always @(*) begin
     for (i = 0; i < S_WIDTH; i=i+1) begin
-        if(in_valid) begin
+        if(in_valid && !current_state) begin
             if(i===3 || i===4 || i===5) begin
                 random_num_ff_temp[i-1] = RANDOM_SEED[i] ^ RANDOM_SEED[0];
             end

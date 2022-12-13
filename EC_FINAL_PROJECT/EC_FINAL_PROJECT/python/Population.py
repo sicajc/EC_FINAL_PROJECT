@@ -36,6 +36,8 @@ class Population:
                 # Extension bit string to 2 bits
                 f.write(format(ind_state, '02b'))
             f.write('\n')
+            f.write(format(-self.population[i].fit, '010b'))
+            f.write('\n')
         f.close()
 
     def __len__(self):

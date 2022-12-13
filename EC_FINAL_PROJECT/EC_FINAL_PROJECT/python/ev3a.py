@@ -166,7 +166,7 @@ def ev3(cfg):
         population.truncateSelect(cfg.populationSize)
 
         # print population stats
-        #printStats(population, i+1)
+        printStats(population, i+1)
 
 
 def write_txt(cfg):
