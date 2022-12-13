@@ -4,7 +4,6 @@ module fitness_eval #(
            parameter PARTICLE_LENGTH          = 2  ,
            parameter LATTICE_LENGTH           = 11 ,
            parameter SELF_FIT_LENGTH          = 10 ,
-           parameter ENERGY_LENGTH            = DATA_WIDTH,
            parameter SELF_ENERGY_VEC_LENGTH   = NUM_PARTICLE_TYPE,
            parameter INTERACTION_MATRIX_LENGTH = (NUM_PARTICLE_TYPE**2),
            parameter INDIVIDUAL_LENGTH        = LATTICE_LENGTH * PARTICLE_LENGTH,
@@ -21,7 +20,6 @@ module fitness_eval #(
            input  wrSelfEnergyValid_i,
            input  wrInteractEnergyValid_i,
            input  in_valid_i,
-           input  Set_data_i,
            input [IDX_WIDTH -1 :0]  ind_idx_i,
 
            //Outputs
@@ -106,6 +104,9 @@ wire wrSelfEnergy_done_flag;
 
 wire[LV5_ADD_RESULT_WIDTH-1: 0] total_energy_wr;
 wire done_flag;
+wire wrInteractRow_bound_reach_flag = interactMatrix_ColPtr == NUM_PARTICLE_TYPE-1;
+wire wrInteractCol_bound_reach_flag = interactMatrix_RowPtr == NUM_PARTICLE_TYPE-1;
+
 
 //================================================================
 //  GENERATE VARAIBLE
@@ -340,13 +341,14 @@ begin: INDIVIDUAL_CNT
     end
     else if(wrInteractEnergyValid_i || wrSelfEnergyValid_i)
     begin
-        if(wrInteractMatrix_done_flag || wrSelfEnergy_done_flag)
+        if(wrInteractMatrix_done_flag)
         begin
             individual_cnt <= 'd0;
         end
         else if(wrInteractRow_bound_reach_flag)
         begin
-            individual_cnt <= 'b100;
+            individual_cnt[3:2] <= individual_cnt[3:2] + 'd1;
+            individual_cnt[1:0] <= 'd0;
         end
         else
         begin
@@ -371,8 +373,6 @@ assign interactMatrix_RowPtr = individual_cnt[3:2];
 assign interactMatrix_ColPtr = individual_cnt[1:0];
 assign selfEnergyPtr         = individual_cnt[1:0];
 
-assign wrInteractRow_bound_reach_flag = interactMatrix_ColPtr == NUM_PARTICLE_TYPE-1;
-assign wrInteractCol_bound_reach_flag = interactMatrix_RowPtr == NUM_PARTICLE_TYPE-1;
 
 assign wrInteractMatrix_done_flag = (wrInteractRow_bound_reach_flag && wrInteractCol_bound_reach_flag);
 assign wrSelfEnergy_done_flag     = (individual_cnt == SELF_ENERGY_VEC_LENGTH-1);
