@@ -1,5 +1,17 @@
 `timescale 1ns/1ps
 `define CYCLE 10
+`define IND        "C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/input.txt"
+`define SELF       "C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/self_energy.txt"
+`define INTERACT   "C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/interact_energy.txt"
+`define SDFFILE    "Netlist/QR_CORDIC_SYN.sdf" 
+
+`ifdef RTL
+  `include "EV3a.v"
+`endif
+
+`ifdef GATE
+  `include "./Netlist/EV3a_SYN.v"
+`endif
 
 module TESTBED ();
 
@@ -40,7 +52,20 @@ integer pop;
 integer input_file,self_energy_file,interact_energy_file;
 integer gap;
 integer k,l,m,n;
+integer total_cycles = 0; 
+integer cycles = 0;
 
+//reg
+reg [IND_FIT_LENGTH-1:0] golden_fit = 'd41;
+reg [INDIVIDUAL_LENGTH-1:0] golden_state = 22'b0010001000100010001000;
+
+initial begin
+  `ifdef GATE
+      $sdf_annotate(`SDFFILE, inst_EV3a);
+  `endif
+end
+
+`ifdef RTL
 //module EV3a
 EV3a #(
         .INT8_LENGTH       (INT8_LENGTH),
@@ -69,6 +94,27 @@ EV3a #(
         .Best_ind_state_o  (Best_ind_state_o),
         .Best_ind_mut_o    (Best_ind_mut_o)
     );
+`endif
+
+`ifdef GATE
+//module EV3a
+EV3a inst_EV3a (
+        .clk               (clk),
+        .rst_n             (rst_n),
+        .self_energy_in    (self_energy_in),
+        .interact_energy_in(interact_energy_in),
+        .Mutate_rate_in    (Mutate_rate_in),
+        .ind_state_in      (ind_state_in),
+        .ind_fit_in        (ind_fit_in),
+        .in_valid_self     (in_valid_self),
+        .in_valid_ind      (in_valid_ind),
+        .in_valid_interact (in_valid_interact),
+        .Min_fit_o         (Min_fit_o),
+        .out_valid         (out_valid),
+        .Best_ind_state_o  (Best_ind_state_o),
+        .Best_ind_mut_o    (Best_ind_mut_o)
+    );
+`endif
 
 //clk
 always
@@ -81,13 +127,15 @@ initial begin
     rst_n = 1;
     set_initail_task;
     reset_signal_task;
-    input_file=$fopen("C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/input.txt","r");
-    self_energy_file=$fopen("C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/self_energy.txt","r");
-    interact_energy_file=$fopen("C:/Users/User/EC_FINAL_PROJECT/EC_FINAL_PROJECT/EC_FINAL_PROJECT/verilog/interact_energy.txt","r");
+    input_file=$fopen(`IND,"r");
+    self_energy_file=$fopen(`SELF,"r");
+    interact_energy_file=$fopen(`INTERACT,"r");
     input_task;
+    wait_out_valid;
+    checkans;
 end
 
-task set_initail_task();begin
+task set_initail_task;begin
     self_energy_in = 'bx;
     interact_energy_in = 'bx;
     Mutate_rate_in = 'bx;
@@ -157,9 +205,10 @@ task check_out; begin
   end
 end endtask:check_out
 
+/*
 task in_valid_ind_check_out_valid; begin
-    while(in_valid_ind==1) begin
-        if(out_valid==1)begin
+    while(in_valid_ind===1) begin
+        if(out_valid===1)begin
             $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
             $display ("                                            Outvalid should be zero while invalid is 1                                                                ");
             $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
@@ -168,5 +217,62 @@ task in_valid_ind_check_out_valid; begin
         end
     end
 end endtask
+*/
+
+task wait_out_valid ; 
+begin
+    cycles = 0;
+    while(out_valid === 0)begin
+        cycles = cycles + 1;
+        if(cycles == 10000) begin
+            $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
+            $display ("                                                                                                                                            ");
+            $display ("                                                     The execution latency are over 10000 cycles                                              ");
+            $display ("                                                                                                                                            ");
+            $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
+            repeat(2)@(negedge clk);
+            $finish;
+        end
+    @(negedge clk);
+    end
+    total_cycles = total_cycles + cycles;
+end 
+endtask
+
+task checkans; begin
+    if(out_valid === 1) begin
+        if((Min_fit_o !== golden_fit) || (Best_ind_state_o !== golden_state)) begin
+            fail_task;
+        end
+        else begin
+            YOU_PASS_task;
+        end
+    end
+end endtask : checkans
+
+task fail_task; begin
+        $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
+        $display ("                                                                        FAIL!                                                               ");
+        $display ("                                                       Your Min_fit -> out: %4d Best_ind_state_o : %23b                     ", Min_fit_o, Best_ind_state_o);
+        $display ("                                                  Golden Golden_fit -> out: %4d golden_state     : %23b                     ", golden_fit, golden_state);
+        $display ("--------------------------------------------------------------------------------------------------------------------------------------------");
+        @(negedge clk);
+        $finish;
+end endtask : fail_task
+
+task YOU_PASS_task;
+    begin
+    $display ("----------------------------------------------------------------------------------------------------------------------");
+    $display ("                                                  Congratulations!                                                   ");
+    $display ("                                           You have passed all patterns!                                             ");
+    $display ("                                       Your Min_fit -> out: %4d Best_ind_state_o : %23b                          ", Min_fit_o, Best_ind_state_o);
+    $display ("                                  Golden Golden_fit -> out: %4d golden_state     : %23b                          ", golden_fit, golden_state);
+    $display ("                                           Your execution cycles = %5d cycles                                    ", total_cycles);
+    $display ("                                           Your clock period = %.1f ns                                           ", `CYCLE);
+    $display ("                                           Your total latency = %.1f ns                                          ", total_cycles*`CYCLE);
+    $display ("----------------------------------------------------------------------------------------------------------------------");
+    $finish;
+    end
+endtask
 
 endmodule : TESTBED

@@ -43,10 +43,10 @@ end
 always @(*) begin
     for (i = 0; i < S_WIDTH; i=i+1) begin
         if(in_valid && !current_state) begin
-            if(i===3 || i===4 || i===5) begin
+            if(i==3 || i==4 || i==5) begin
                 random_num_ff_temp[i-1] = RANDOM_SEED[i] ^ RANDOM_SEED[0];
             end
-            else if(i === 0) begin
+            else if(i == 0) begin
                 random_num_ff_temp[S_WIDTH-1] = RANDOM_SEED[0];
             end
             else begin
@@ -54,10 +54,10 @@ always @(*) begin
             end
         end
         else if(current_state) begin
-            if(i===3 || i===4 || i===5) begin
+            if(i==3 || i==4 || i==5) begin
                 random_num_ff_temp[i-1] = random_num_ff_reg[i] ^ random_num_ff_reg[0];
             end
-            else if(i === 0) begin
+            else if(i == 0) begin
                 random_num_ff_temp[S_WIDTH-1] = random_num_ff_reg[0];
             end
             else begin

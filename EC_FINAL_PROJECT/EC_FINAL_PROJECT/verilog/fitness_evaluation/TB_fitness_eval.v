@@ -9,8 +9,6 @@ parameter DATA_WIDTH               = 4  ;
 parameter PARTICLE_LENGTH          = 2  ;
 parameter LATTICE_LENGTH           = 11 ;
 parameter SELF_FIT_LENGTH          = 10 ;
-parameter SELF_ENERGY_VEC_LENGTH   = NUM_PARTICLE_TYPE;
-parameter INTERACTION_MATRIX_LENGTH = (NUM_PARTICLE_TYPE**2);
 parameter INDIVIDUAL_LENGTH        = LATTICE_LENGTH * PARTICLE_LENGTH;
 parameter POP_SIZE                 = 50;
 parameter IDX_WIDTH                = 8;
@@ -161,8 +159,6 @@ end
             .PARTICLE_LENGTH(PARTICLE_LENGTH),
             .LATTICE_LENGTH(LATTICE_LENGTH),
             .SELF_FIT_LENGTH(SELF_FIT_LENGTH),
-            .SELF_ENERGY_VEC_LENGTH(SELF_ENERGY_VEC_LENGTH),
-            .INTERACTION_MATRIX_LENGTH(INTERACTION_MATRIX_LENGTH),
             .INDIVIDUAL_LENGTH(INDIVIDUAL_LENGTH),
             .POP_SIZE(POP_SIZE),
             .IDX_WIDTH(IDX_WIDTH),
