@@ -123,25 +123,40 @@ integer i,j;
 //===============================//
 always @(posedge clk_i or negedge rst_n )
 begin : IN_VALID_BUF
-    in_valid_buf <= ~rst_n ? 1'b0 : in_valid_i;
-    ind_idx_buf  <= ~rst_n ? 1'b0 : ind_idx_i;
+    if(~rst_n)
+    begin
+        in_valid_buf <= 1'b0;
+        ind_idx_buf  <= 1'b0;
+    end
+    else
+    begin
+        in_valid_buf <= in_valid_i;
+        ind_idx_buf  <= ind_idx_i;
+    end
+    // in_valid_buf <= ~rst_n ? 1'b0 : in_valid_i;
+    // ind_idx_buf  <= ~rst_n ? 1'b0 : ind_idx_i;
 end
 
 
 always @(posedge clk_i or negedge rst_n)
 begin: IND_BUF
-    integer i;
-    for(i=0;i<LATTICE_LENGTH;i=i+1)
+    // for(i=0;i<LATTICE_LENGTH;i=i+1)
+    // begin
+    if(~rst_n)
     begin
-        if(~rst_n)
+        for(i=0;i<LATTICE_LENGTH;i=i+1)
         begin
             individual_buffer[i] <= 'd0;
         end
-        else
+    end
+    else
+    begin
+        for(i=0;i<LATTICE_LENGTH;i=i+1)
         begin
             individual_buffer[i] <= in_valid_i ? individual_vec_i[INDIVIDUAL_LENGTH-1 - PARTICLE_LENGTH*i -: PARTICLE_LENGTH] : 'd0;
         end
     end
+    // end
 end
 
 //==============================//
@@ -149,41 +164,62 @@ end
 //==============================//
 always @(posedge clk_i or negedge rst_n)
 begin: SELF_ENERGY_VEC_RF
-    for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
+    // for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
+    // begin
+    if(~rst_n)
     begin
-        if(~rst_n)
+        for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         begin
             self_energy_vec_rf[i] <= 'd0;
         end
-        else if(wrSelfEnergyValid_i)
+    end
+    else if(wrSelfEnergyValid_i)
+    begin
+        for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         begin
             self_energy_vec_rf[selfEnergyPtr] <= self_energy_i;
         end
-        else
+    end
+    else
+    begin
+        for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         begin
             self_energy_vec_rf[i] <= self_energy_vec_rf[i];
         end
     end
+    // end
 end
 
 always @(posedge clk_i or negedge rst_n)
 begin: INTERACT_MATRIX_RF
-    for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
-        for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
+    // for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
+    // for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
+    // begin
+    if(~rst_n)
+    begin
+        for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
         begin
-            if(~rst_n)
+            for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
             begin
                 interact_matrix_rf[i][j] <= 'd0;
             end
-            else if(wrInteractEnergyValid_i)
-            begin
-                interact_matrix_rf[interactMatrix_RowPtr][interactMatrix_ColPtr] <= interact_energy_i;
-            end
-            else
+        end
+    end
+    else if(wrInteractEnergyValid_i)
+    begin
+        interact_matrix_rf[interactMatrix_RowPtr][interactMatrix_ColPtr] <= interact_energy_i;
+    end
+    else
+    begin
+        for(i=0;i<NUM_PARTICLE_TYPE;i=i+1)
+        begin
+            for(j=0;j<NUM_PARTICLE_TYPE;j=j+1)
             begin
                 interact_matrix_rf[i][j] <= interact_matrix_rf[i][j];
             end
         end
+    end
+    // end
 end
 
 //=====================//
@@ -192,54 +228,78 @@ end
 
 always @(posedge clk_i or negedge rst_n)
 begin: SELF_ENERGY_DF_ADD1_PIPE
-    for(i = 0; i < LATTICE_LENGTH ; i = i + 1)
-        if(~rst_n)
+    // for(i = 0; i < LATTICE_LENGTH ; i = i + 1)
+    if(~rst_n)
+    begin
+        for(i = 0; i < LATTICE_LENGTH ; i = i + 1)
         begin
             self_energy_DF_ADD1_pipe[i] <= 'd0;
         end
-        else
+    end
+    else
+    begin
+        for(i = 0; i < LATTICE_LENGTH ; i = i + 1)
         begin
             self_energy_DF_ADD1_pipe[i] <= self_energy_vec_rf[individual_buffer[i]];
         end
+    end
 end
 
 always @(posedge clk_i or negedge rst_n)
 begin: INTERACT_ENERGY_DF_ADD1_PIPE
-    for(i=0;i<LATTICE_LENGTH-1;i=i+1)
+    // for(i=0;i<LATTICE_LENGTH-1;i=i+1)
+    if(~rst_n)
     begin
-        //0~9 total 10 lines are being pulled out.
-        if(~rst_n)
+        for(i=0;i<LATTICE_LENGTH-1;i=i+1)
         begin
             interact_energy_DF_ADD1_pipe[i] <= 'd0;
         end
-        else
+    end
+    else
+    begin
+        for(i=0;i<LATTICE_LENGTH-1;i=i+1)
         begin
             interact_energy_DF_ADD1_pipe[i] <= (interact_matrix_rf[individual_buffer[i]][individual_buffer[i+1]] << 1);
         end
     end
+
 end
 
 always @(posedge clk_i or negedge rst_n)
 begin: INDIVIDUAL_VEC_DF_ADD1_PIPE
-    for(i=0;i<LATTICE_LENGTH;i=i+1)
+    // for(i=0;i<LATTICE_LENGTH;i=i+1)
+    // begin
+    if(~rst_n)
     begin
-        if(~rst_n)
-        begin
-            individual_vec_DF_ADD1_pipe <= 'd0;
-        end
-        else
+        individual_vec_DF_ADD1_pipe <= 'd0;
+    end
+    else
+    begin
+        for(i=0;i<LATTICE_LENGTH;i=i+1)
         begin
             individual_vec_DF_ADD1_pipe[INDIVIDUAL_LENGTH-1 - PARTICLE_LENGTH*i -: PARTICLE_LENGTH] <= individual_buffer[i];
         end
     end
+    // end
 end
 
 
 
 always @(posedge clk_i or negedge rst_n )
 begin: IN_VALID_DF_ADD1_PIPE
-    in_valid_DF_ADD1_pipe      <= ~rst_n ? 1'b0 : in_valid_buf;
-    ind_idx_DF_ADD1_pipe       <= ~rst_n ? 1'b0 : ind_idx_buf;
+    if(~rst_n)
+    begin
+        in_valid_DF_ADD1_pipe<= 1'b0;
+        ind_idx_DF_ADD1_pipe <= 1'b0;
+    end
+    else
+    begin
+        in_valid_DF_ADD1_pipe<= in_valid_buf;
+        ind_idx_DF_ADD1_pipe <= ind_idx_buf;
+    end
+
+    // in_valid_DF_ADD1_pipe      <= ~rst_n ? 1'b0 : in_valid_buf;
+    // ind_idx_DF_ADD1_pipe       <= ~rst_n ? 1'b0 : ind_idx_buf;
 end
 
 //=======================//
@@ -297,21 +357,37 @@ assign partial_energy_add_tree_lv3[2] = interact_energy_add_tree_lv2[1] + intera
 
 always @(posedge clk_i or negedge rst_n)
 begin: ADD1_ADD2_PIPE
-    for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM ; pipe_idx = pipe_idx + 1)
-        if(~rst_n)
+    // for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM ; pipe_idx = pipe_idx + 1)
+    if(~rst_n)
+    begin
+        for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM ; pipe_idx = pipe_idx + 1)
         begin
             partial_energy_ADD1_ADD2_pipe[pipe_idx] <= 'd0;
         end
-        else
+    end
+    else
+    begin
+        for(pipe_idx = 0 ; pipe_idx < LV3_ADDER_NUM ; pipe_idx = pipe_idx + 1)
         begin
             partial_energy_ADD1_ADD2_pipe[pipe_idx] <= partial_energy_add_tree_lv3[pipe_idx];
         end
+    end
 end
 
 always @(posedge clk_i or negedge rst_n)
 begin: IN_VALID_ADD1_ADD2_PIPE
-    in_valid_ADD1_ADD2_pipe <= ~rst_n ? 1'd0 : in_valid_DF_ADD1_pipe;
-    ind_idx_add1_add2_pipe  <= ~rst_n ? 1'd0 : ind_idx_DF_ADD1_pipe;
+    if(~rst_n)
+    begin
+        in_valid_ADD1_ADD2_pipe<= 1'd0;
+        ind_idx_add1_add2_pipe <= 1'd0;
+    end
+    else
+    begin
+        in_valid_ADD1_ADD2_pipe <= in_valid_DF_ADD1_pipe;
+        ind_idx_add1_add2_pipe  <= ind_idx_DF_ADD1_pipe;
+    end
+    // in_valid_ADD1_ADD2_pipe <= ~rst_n ? 1'd0 : in_valid_DF_ADD1_pipe;
+    // ind_idx_add1_add2_pipe  <= ~rst_n ? 1'd0 : ind_idx_DF_ADD1_pipe;
 end
 
 always @(posedge clk_i or negedge rst_n)
@@ -384,7 +460,14 @@ assign done_flag                        = (individual_cnt == POP_SIZE-1);
 //====================//
 always @(posedge clk_i or negedge rst_n)
 begin: TOTAL_ENERGY_O
-    total_energy_ff_o <= ~rst_n ? 'd0 : total_energy_wr;
+    if(~rst_n)
+    begin
+        total_energy_ff_o <= 'd0;
+    end
+    else
+    begin
+        total_energy_ff_o <= total_energy_wr;
+    end
 end
 
 
@@ -403,9 +486,21 @@ end
 
 always @(posedge clk_i or negedge rst_n)
 begin: OUTPUT_INDICATOR_SIGNAL_O
-    done_ff_o           <= ~rst_n ? 1'b0 : done_flag;
-    out_valid_ff_o      <= ~rst_n ? 1'b0 : in_valid_ADD1_ADD2_pipe;
-    ind_wb_idx_ff_o     <= ~rst_n ? 1'b0 : ind_idx_add1_add2_pipe;
+    if(~rst_n)
+    begin
+        done_ff_o <= 1'b0;
+        out_valid_ff_o <= 1'b0;
+        ind_wb_idx_ff_o <= 1'b0;
+    end
+    else
+    begin
+        done_ff_o <= done_flag;
+        out_valid_ff_o <=  in_valid_ADD1_ADD2_pipe;
+        ind_wb_idx_ff_o <= ind_idx_add1_add2_pipe;
+    end
+    // done_ff_o           <= ~rst_n ? 1'b0 : done_flag;
+    // out_valid_ff_o      <= ~rst_n ? 1'b0 : in_valid_ADD1_ADD2_pipe;
+    // ind_wb_idx_ff_o     <= ~rst_n ? 1'b0 : ind_idx_add1_add2_pipe;
 end
 
 
